@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Голубиная книга</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Ruslan+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #16130f;
+    --parch: #efe4cc;
+    --parch-dim: #b9ab8f;
+    --gold: #cfa655;
+    --gold-dim: #8a6d35;
+    --red: #b5432b;
+    --line: rgba(207, 166, 85, .28);
+    --display: "Ruslan Display", "Cormorant Garamond", serif;
+    --serif: "Cormorant Garamond", "Georgia", serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #0c0a08; color: var(--parch); font-family: var(--serif); overflow: hidden; }
+
+  /* Сцена 1600×900, масштабируется под окно */
+  #stage {
+    position: absolute; left: 50%; top: 50%;
+    width: 1600px; height: 900px;
+    transform-origin: center center;
+    background: radial-gradient(ellipse at 50% 0%, #2a2219 0%, var(--ink) 60%);
+    overflow: hidden;
+  }
+  .slide {
+    position: absolute; inset: 0;
+    padding: 80px 110px 90px;
+    opacity: 0; visibility: hidden;
+    transition: opacity .5s ease, visibility .5s;
+    display: flex; flex-direction: column;
+  }
+  .slide.active { opacity: 1; visibility: visible; }
+
+  /* рамка-орнамент */
+  .slide::before {
+    content: ""; position: absolute; inset: 28px;
+    border: 1px solid var(--line); pointer-events: none;
+  }
+  .slide::after {
+    content: ""; position: absolute; inset: 34px;
+    border: 1px solid rgba(207,166,85,.12); pointer-events: none;
+  }
+
+  .kicker { font-size: 22px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; font-weight: 500; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: 96px; line-height: 1.05; color: var(--parch); }
+  h2 { font-family: var(--display); font-weight: 400; font-size: 58px; line-height: 1.1; color: var(--parch); margin-bottom: 34px; }
+  h2 .red, h1 .red { color: var(--red); }
+  p, li { font-size: 30px; line-height: 1.38; }
+  .muted { color: var(--parch-dim); }
+  .gold { color: var(--gold); }
+  ul.list { list-style: none; }
+  ul.list li { padding-left: 34px; position: relative; margin-bottom: 16px; }
+  ul.list li::before { content: "✥"; position: absolute; left: 0; top: 2px; color: var(--gold); font-size: 22px; }
+  .src { position: absolute; left: 110px; right: 110px; bottom: 50px; font-size: 18px; color: var(--parch-dim); font-style: italic; }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; flex: 1; min-height: 0; }
+  .cols.wide-left { grid-template-columns: 1.25fr 1fr; }
+  .cols.wide-right { grid-template-columns: 1fr 1.3fr; }
+
+  .verse {
+    font-size: 29px; line-height: 1.34; font-style: italic;
+    border-left: 3px solid var(--red); padding-left: 28px;
+  }
+  .verse .attr { display: block; font-style: normal; font-size: 19px; color: var(--parch-dim); margin-top: 14px; letter-spacing: .04em; }
+  .verse b { color: var(--gold); font-weight: 600; font-style: normal; }
+  .verse.q { border-color: var(--gold-dim); }
+
+  figure { display: flex; flex-direction: column; min-height: 0; }
+  figure img { width: 100%; height: 100%; object-fit: contain; min-height: 0; flex: 1; filter: drop-shadow(0 12px 30px rgba(0,0,0,.6)); }
+  figcaption { font-size: 18px; color: var(--parch-dim); margin-top: 12px; font-style: italic; text-align: center; }
+
+  /* слайд Федосовой: место под крупный текст стиха */
+  .fedosova { padding-top: 58px; padding-bottom: 76px; }
+  .fedosova h2 { font-size: 52px; margin-bottom: 22px; }
+  .fedosova .cols { grid-template-columns: 250px 1fr 1.18fr; gap: 42px; }
+  .fedosova .verse { font-size: 29px; line-height: 1.24; padding-left: 26px; }
+  .fedosova .list li { font-size: 25px; margin-bottom: 14px; }
+
+  /* титул */
+  .title-slide { justify-content: flex-end; padding-bottom: 120px; }
+  .title-slide .bg { position: absolute; inset: 0; background: url("roerich-1922.jpg") center 35% / cover no-repeat; opacity: .55; }
+  .title-slide .veil { position: absolute; inset: 0; background: linear-gradient(to top, var(--ink) 18%, rgba(22,19,15,.55) 55%, rgba(22,19,15,.2) 100%); }
+  .title-slide > *:not(.bg):not(.veil) { position: relative; }
+  .title-slide h1 { font-size: 120px; }
+
+  /* плашки-матери */
+  .mothers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .mother { border: 1px solid var(--line); padding: 20px 22px; background: rgba(0,0,0,.18); }
+  .mother .what { font-size: 18px; letter-spacing: .16em; text-transform: uppercase; color: var(--parch-dim); }
+  .mother .who { font-family: var(--display); font-size: 32px; color: var(--gold); margin: 6px 0 6px; }
+  .mother .why { font-size: 21px; line-height: 1.3; }
+
+  /* вопрос с раскрытием ответа */
+  .qa { justify-content: flex-start; }
+  .qa h2 { font-size: 70px; margin: 8px 0 46px; }
+  .qa .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; flex: 1; min-height: 0; align-items: start; }
+  .qa .name { font-family: var(--display); font-size: 64px; color: var(--red); line-height: 1; margin-bottom: 28px; }
+  .qa .grid p { font-size: 27px; }
+
+  /* пошаговое раскрытие */
+  .step { opacity: 0; transition: opacity .45s ease; }
+  .step.on { opacity: 1; }
+
+  /* плеер */
+  .play {
+    display: inline-flex; align-items: center; gap: 16px;
+    background: var(--red); color: var(--parch); border: none; cursor: pointer;
+    font-family: var(--serif); font-size: 26px; font-weight: 600;
+    padding: 14px 30px 14px 22px; margin-top: 26px; align-self: flex-start;
+    transition: background .2s;
+  }
+  .play:hover { background: #cc5238; }
+  .play .ic { width: 40px; height: 40px; border-radius: 50%; background: var(--parch); color: var(--red); display: grid; place-items: center; font-size: 18px; }
+  .play-note { font-size: 18px; color: var(--parch-dim); margin-top: 10px; }
+  .play-note a { color: var(--gold); }
+  #ytwrap { position: absolute; width: 1px; height: 1px; overflow: hidden; left: -10px; top: -10px; }
+
+  /* интерфейс */
+  #progress { position: fixed; left: 0; bottom: 0; height: 4px; background: var(--gold); transition: width .4s; z-index: 5; }
+  #counter { position: fixed; right: 18px; bottom: 12px; font-size: 15px; color: var(--parch-dim); font-family: var(--serif); z-index: 5; letter-spacing: .1em; }
+  #notes {
+    position: fixed; left: 0; right: 0; bottom: 0; max-height: 34vh; overflow: auto;
+    background: rgba(12,10,8,.96); border-top: 1px solid var(--gold-dim);
+    padding: 16px 28px 26px; font-size: 18px; line-height: 1.45; color: var(--parch);
+    display: none; z-index: 6;
+  }
+  #notes.show { display: block; }
+  #notes .h { color: var(--gold); font-size: 13px; letter-spacing: .2em; text-transform: uppercase; margin-bottom: 6px; }
+  #help { position: fixed; left: 18px; bottom: 12px; font-size: 14px; color: rgba(185,171,143,.55); z-index: 5; }
+  .notes { display: none; }
+
+  .biblio li { font-size: 21px; line-height: 1.32; margin-bottom: 9px; }
+</style>
+</head>
+<body>
+<div id="stage">
+
+<!-- 1. Титул -->
+<section class="slide title-slide active">
+  <div class="bg"></div><div class="veil"></div>
+  <div class="kicker">Русский духовный стих</div>
+  <h1>Голубиная<br><span class="red">книга</span></h1>
+  <div class="notes">Фон — Н. К. Рерих, «Голубиная книга», 1922 (Государственный музей Востока). Сегодня: жанр, происхождение, запись голоса Федосовой, сюжет, три вопроса залу, духоборы и современное исполнение.</div>
+</section>
+
+<!-- 2. Жанр -->
+<section class="slide">
+  <div class="kicker">Жанр</div>
+  <h2>Духовный стих</h2>
+  <div class="cols wide-left">
+    <ul class="list">
+      <li>Эпическая песня на религиозный сюжет — «народная Библия» неграмотной Руси.</li>
+      <li>Исполнители — <span class="gold">калики перехожие</span>: нищие странники, слепцы, паломники; позже — сказители Русского Севера.</li>
+      <li>Стоит между книжностью и фольклором: сюжеты из Писания и апокрифов, язык и напев — былинные.</li>
+      <li>«Голубиная книга» — самый известный и, по словам исследователей, «важнейший» стих: он отвечает на вопросы о происхождении мира и человека.</li>
+    </ul>
+    <div class="verse">
+      Духовные стихи — это «русская народная вера», изложенная самим народом, а «Голубиная книга» — её космология.
+      <span class="attr">по Г. П. Федотову, «Стихи духовные» (Париж, 1935)</span>
+    </div>
+  </div>
+  <div class="src">Федотов Г. П. Стихи духовные. Русская народная вера по духовным стихам. Париж, 1935 (М., 1991); Бессонов П. А. Калеки перехожие. М., 1861–1864.</div>
+  <div class="notes">Подчеркнуть: духовный стих — не церковное песнопение, его пели вне храма. Калики — профессиональные странники-певцы.</div>
+</section>
+
+<!-- 3. Происхождение и имя -->
+<section class="slide">
+  <div class="kicker">Происхождение</div>
+  <h2>Откуда пришла книга</h2>
+  <div class="cols">
+    <div>
+      <ul class="list">
+        <li><span class="gold">Сложение:</span> кон. XV — нач. XVI в., Псково-Новгородские земли; окончательная форма — к нач. XVII в.</li>
+        <li><span class="gold">Первая запись:</span> сборник Кирши Данилова (сер. XVIII в., Урал) — «Голубина книга сорока пядень».</li>
+        <li><span class="gold">Более 20 вариантов</span> в XIX в.: Варенцов (1860), Бессонов (1861, 16 вар.), Тихонравов.</li>
+        <li><span class="gold">Источники:</span> апокрифы «Беседа трёх святителей», «Вопросы Иоанна Богослова на горе Фаворской», «Беседа Иерусалимская»; образ небесной книги — Апокалипсис, гл. 5.</li>
+      </ul>
+    </div>
+    <div>
+      <p class="gold" style="font-size:24px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:14px">Почему «голубиная»?</p>
+      <ul class="list">
+        <li><b>Глубинная</b> — книга «глубины премудрости». Св. Авраамия Смоленского (XII–XIII вв.) обвиняли в чтении «глубинных книг».</li>
+        <li>В народе слово переосмыслено через <b>голубя</b> — символ Святого Духа.</li>
+        <li>Есть и версии-гипотезы: параллель с иранским «Бундахишн» (В. Н. Топоров), с евр. «сефер тора» (А. А. Архипов).</li>
+      </ul>
+    </div>
+  </div>
+  <div class="src">Никитина С. Е. Голубиная книга // Православная энциклопедия. Т. 12; ЭСБЕ, ст. «Голубиная книга»; Мочульский В. Н. Историко-литературный анализ стиха о Голубиной книге. Варшава, 1887.</div>
+  <div class="notes">Главное: стих — народная переработка книжных апокрифов в форме вопросов и ответов.</div>
+</section>
+
+<!-- 4. Федосова -->
+<section class="slide fedosova">
+  <div class="kicker">Голос XIX века</div>
+  <h2>Ирина Федосова</h2>
+  <div class="cols">
+    <figure>
+      <img src="fedosova.jpg" alt="Ирина Андреевна Федосова">
+      <figcaption>И. А. Федосова (1827–1899)</figcaption>
+    </figure>
+    <div>
+      <ul class="list">
+        <li>Великая заонежская вопленица из д. Кузаранда; знала десятки тысяч стихов.</li>
+        <li>Впервые записана Е. В. Барсовым в 1867 г. («Причитанья Северного края»).</li>
+        <li>В январе 1896 г. в Москве Юлий Блок записал её <span class="gold">на фонограф</span>: 19 стихов «Голубиной книги».</li>
+        <li>Каждый раз пела стих по-новому: у Барсова — 45 стихов, у Агреневой-Славянской — 129.</li>
+      </ul>
+      <button class="play" id="playBtn" type="button"><span class="ic" id="playIc">▶</span><span id="playLbl">Слушать запись 1896 г.</span></button>
+      <div class="play-note" id="playNote"></div>
+    </div>
+    <div class="verse">
+      Что в осьмомъ году, осьмой тысяче,<br>
+      Восьмой тысяче, да марте месяце,<br>
+      Восьмой тысяче, марте месяце,<br>
+      Наставала тученька темная,<br>
+      Наставала тученька темная,<br>
+      Ай, темна — грозна да страховитая,<br>
+      Ай, темна — грозна, страховитая,<br>
+      Со громомъ туча́ да со молниёй,<br>
+      Со громомъ туча́ да со молниёй,<br>
+      На тую пору да на Фавор гору,<br>
+      Как на тую пору да на Фавор гору,<br>
+      Ко тому кресту да ко Господънему,<br>
+      Ко тому кресту ко Господнему<br>
+      Ко тыимъ мощам да ко Адамовым,<br>
+      Ко тыимъ мощам ко Адамовым,<br>
+      <b>Выпадала Книга Голубиная,</b><br>
+      <b>Выпадала Книга Голубиная…</b>
+    </div>
+  </div>
+  <div class="src">Кузнецова В. П. И. А. Федосова и её духовные стихи // Рябининские чтения — 2015. Петрозаводск: Музей-заповедник «Кижи», 2015.</div>
+  <div class="notes">Включить запись. Зачин «в осьмом году, осьмой тысяче» — 7008 год от сотворения мира, т. е. 1500-й, год ожидания конца света; формула типична для стиха о «Мучениях Егория» — Федосова свободно комбинировала зачины. Повторы строк — черта живого исполнения.</div>
+</section>
+
+<!-- 5. Завязка -->
+<section class="slide">
+  <div class="kicker">Сюжет · Завязка</div>
+  <h2>Книга из тёмной тучи</h2>
+  <div class="cols wide-right">
+    <div>
+      <div class="verse" style="font-size:25px">
+        Восходила туча сильна, грозная,<br>
+        Выпадала книга Голубиная…<br>
+        Никто ко книге не приступится…<br>
+        Приходил ко книге премудрый царь,<br>
+        Премудрый царь <b>Давыд Евсеевич</b>…<br>
+        «Писал сию книгу сам Исус Христос…<br>
+        Читал сию книгу сам Исай-пророк,<br>
+        Читал он книгу ровно три года,<br>
+        Прочитал из книги ровно три листа».
+        <span class="attr">Оксенов А. В. Народная поэзия. СПб., 1908</span>
+      </div>
+      <p class="muted" style="font-size:24px;margin-top:22px">Книга огромна — «в долину сорока пядей, поперёк двадцати». Собираются сорок царей, сорок князей, сорок калик — но открыть её может лишь Давид, да и он «прочесть не может», а пересказывает «по старой памяти».</p>
+    </div>
+    <figure>
+      <img src="roerich-1911.jpg" alt="Рерих. Цари над Голубиной книгой">
+      <figcaption>Н. К. Рерих. Ранний вариант «Голубиной книги», 1911. Смоленский музей-заповедник</figcaption>
+    </figure>
+  </div>
+  <div class="notes">Книга символизирует божественное знание, непостижимое разумом: даже пророк Исайя за три года прочёл лишь три листа. Знание передаётся не чтением, а памятью — как и сам стих.</div>
+</section>
+
+<!-- 6. Космогония -->
+<section class="slide">
+  <div class="kicker">Сюжет · Космогония</div>
+  <h2>Мир — отблеск <span class="red">Бога</span></h2>
+  <div class="cols">
+    <div class="verse">
+      А и белой свет — от лица божья,<br>
+      Со(л)нцо праведно — <b>от очей его</b>,<br>
+      Светел месяц — <b>от темичка</b>,<br>
+      Темная ночь — от затылечка,<br>
+      Заря утрення и вечерняя — от бровей божьих,<br>
+      Часты звезды — <b>от кудрей божьих</b>!
+      <span class="attr">Сборник Кирши Данилова, сер. XVIII в.</span>
+      <br>
+      Ветры буйные — <b>от Свята Духа</b>,<br>
+      Дробен дождик — от слёз Христа…
+      <span class="attr">Оксенов, 1908</span>
+    </div>
+    <div>
+      <ul class="list">
+        <li>Не творение «из ничего» (<i>ex nihilo</i>), а <span class="gold">исхождение</span> мира из тела Бога — мир как Его отблеск и проявление.</li>
+        <li>Космос строится по образу лица и головы: верх неба — «темечко», ночь — «затылок».</li>
+        <li>В. Н. Топоров сближает эту картину с древнейшими мифами о мире из тела первосущества (ведийский Пуруша, иранский Бундахишн).</li>
+      </ul>
+    </div>
+  </div>
+  <div class="src">Топоров В. Н. Голубиная книга // Мифы народов мира. Т. 1. М., 1980; Кирша Данилов. Древние российские стихотворения. М., 1977.</div>
+  <div class="notes">В разных вариантах части тела меняются (солнце — то от лица, то от очей). Устойчив сам принцип.</div>
+</section>
+
+<!-- 7. Антропогония -->
+<section class="slide">
+  <div class="kicker">Сюжет · Антропогония</div>
+  <h2>Человек — малый мир</h2>
+  <div class="cols">
+    <div class="verse">
+      Наши помыслы — <b>от облац небесныих</b>,<br>
+      У нас мир-народ — от Адамия,<br>
+      Кости крепкие — <b>от камени</b>,<br>
+      Телеса наши — <b>от сырой земли</b>,<br>
+      Кровь-руда наша — <b>от черна моря</b>.<br>
+      От того у нас в земле цари пошли:<br>
+      От святой главы от Адамовой…<br>
+      От того крестьяны православные:<br>
+      От свята колена от Адамова.
+      <span class="attr">Оксенов, 1908</span>
+    </div>
+    <div>
+      <ul class="list">
+        <li><span class="gold">Макрокосм ↔ микрокосм:</span> тело человека собрано из стихий мира — камня, земли, моря, облаков.</li>
+        <li>Мир порождён из Бога, человек — из мира: две зеркальные цепи соответствий.</li>
+        <li>Отсюда же — <span class="gold">социальный порядок</span>: цари от головы Адама, князья-бояре — от «мощей», крестьяне — от колена.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="src">Никитина С. Е. Голубиная книга // Православная энциклопедия; ср. апокриф «Беседа трёх святителей» (о восьми частях Адамова тела).</div>
+</section>
+
+<!-- 8. Волотоман и Давыд -->
+<section class="slide">
+  <div class="kicker">Сюжет · Диалог</div>
+  <h2>Волотоман и Давыд</h2>
+  <div class="cols wide-right">
+    <div>
+      <ul class="list" style="font-size:26px">
+        <li style="font-size:26px"><span class="gold">Волотоман Волотоманович</span> спрашивает — имя от «волот», великан. В вариантах он же Володимир или Малодумар, «малодумный» против премудрого.</li>
+        <li style="font-size:26px"><span class="gold">Давыд Евсеевич</span> — библейский царь, автор Псалтыри, отвечает по памяти.</li>
+        <li style="font-size:26px">Форма «вопрос — ответ» унаследована от апокрифической «Беседы трёх святителей». Сначала спрашивают о происхождении мира, затем — о том, что в мире <span class="gold">главное</span>.</li>
+      </ul>
+      <div class="verse q" style="font-size:25px;margin-top:10px">
+        Который царь над царями царь?<br>
+        Кая земля всем землям мати?<br>
+        Кое древо всем древам мати?
+        <span class="attr">ответ: «У нас Белый царь — над царями царь… Святая Русь-земля всем землям мати»</span>
+      </div>
+    </div>
+    <figure>
+      <img src="roerich-1922.jpg" alt="Рерих. Голубиная книга, 1922">
+      <figcaption>Н. К. Рерих. «Голубиная книга», 1922. Государственный музей Востока, Москва</figcaption>
+    </figure>
+  </div>
+  <div class="notes">Переход к залу: «Давайте ответим на три вопроса Волотомана сами». На картине книга раскинута как крылья птицы — отсылка к «голубиному» имени.</div>
+</section>
+
+<!-- 9. Вопрос 1 -->
+<section class="slide qa">
+  <div class="kicker">Вопрос Волотомана</div>
+  <h2>Который город городам <span class="red">отец</span>?</h2>
+  <div class="grid">
+    <div class="step">
+      <div class="name">Иерусалим</div>
+      <p class="muted">Не столица и не самый большой город, а <span class="gold">середина земли</span>: под алтарём храма Воскресения, по преданию, лежит «пуп земли».</p>
+    </div>
+    <div class="step verse">
+      Иерусалим-город городам отец.<br>
+      Почему тот город городам отец?<br>
+      Потому Иерусалим городам отец:<br>
+      Во тем во граде во Иерусалиме<br>
+      <b>Тут у нас среда земле.</b>
+      <span class="attr">Оксенов, 1908</span>
+    </div>
+  </div>
+  <div class="notes">Дать залу 10–15 секунд, затем нажать → для ответа.</div>
+</section>
+
+<!-- 10. Вопрос 2 -->
+<section class="slide qa">
+  <div class="kicker">Вопрос Волотомана</div>
+  <h2>Кая рыба всем рыбам <span class="red">мати</span>?</h2>
+  <div class="grid">
+    <div class="step">
+      <div class="name">Кит-рыба</div>
+      <p class="muted">На ней держится земля. Число китов в вариантах разное — три, семь, тридцать; образ пришёл прямо из «Беседы трёх святителей».</p>
+    </div>
+    <div class="step verse">
+      Кит-рыба всем рыбам мати…<br>
+      <b>На трех рыбах земля основана.</b><br>
+      Стоит кит-рыба — не сворохнется;<br>
+      Когда ж кит-рыба поворотится,<br>
+      Тогда мать-земля восколыбнется,<br>
+      <b>Тогда белый свет наш покончится.</b>
+      <span class="attr">Оксенов, 1908 · у Кирши Данилова — «на семи китах земля основана»</span>
+    </div>
+  </div>
+  <div class="notes">Запомнить кита: на слайде о духоборах он окажется символом государства.</div>
+</section>
+
+<!-- 11. Вопрос 3 -->
+<section class="slide qa">
+  <div class="kicker">Вопрос Волотомана</div>
+  <h2>Кая гора всем горам <span class="red">мати</span>?</h2>
+  <div class="grid">
+    <div class="step">
+      <div class="name">Фавор</div>
+      <p class="muted">Гора Преображения — и та самая, на которую у Федосовой падает книга. У Кирши Данилова ответ другой: <span class="gold">«Сионская гора — всем горам мати»</span>. Кто сказал «Сион» — тоже прав.</p>
+    </div>
+    <div class="step verse">
+      Фавор-гора всем горам мати.<br>
+      Почему Фавор-гора горам мати?<br>
+      <b>Преобразился на ней сам Исус Христос</b>,<br>
+      Исус Христос, Царь Небесный, свет,<br>
+      С Петром, со Иоанном, со Иаковом…<br>
+      Показал славу ученикам своим.
+      <span class="attr">Оксенов, 1908</span>
+    </div>
+  </div>
+  <div class="notes">Связать с записью Федосовой: «на тую пору да на Фавор гору… выпадала Книга Голубиная».</div>
+</section>
+
+<!-- 12. Матери -->
+<section class="slide">
+  <div class="kicker">Символика</div>
+  <h2>«Которая всем … мати?»</h2>
+  <p class="muted" style="font-size:25px;margin:-14px 0 26px">Вторая серия вопросов выстраивает иерархию мира: у каждого рода вещей — своя «мать», главная святыня.</p>
+  <div class="mothers">
+    <div class="mother"><div class="what">город</div><div class="who">Иерусалим</div><div class="why">«тут у нас среда земле» — центр мира</div></div>
+    <div class="mother"><div class="what">река</div><div class="who">Иордан</div><div class="why">в ней крестился Христос</div></div>
+    <div class="mother"><div class="what">гора</div><div class="who">Фавор</div><div class="why">место Преображения (у Кирши — Сион)</div></div>
+    <div class="mother"><div class="what">камень</div><div class="who">Алатырь</div><div class="why">на нём Христос «распущал книгу Голубиную»</div></div>
+    <div class="mother"><div class="what">древо</div><div class="who">Кипарис</div><div class="why">из него — крест Распятия</div></div>
+    <div class="mother"><div class="what">трава</div><div class="who">Плакун</div><div class="why">выросла из слёз Богородицы</div></div>
+    <div class="mother"><div class="what">птица</div><div class="who">Стратим</div><div class="why">вострепенётся — море всколыхнётся</div></div>
+    <div class="mother"><div class="what">зверь</div><div class="who">Индрик</div><div class="why">ходит под землёй, прочищает ключи</div></div>
+  </div>
+  <p style="font-size:22px;margin-top:26px" class="muted">Алатырь (А. Н. Веселовский) — <span class="gold">алтарный камень</span> Сионской церкви, где впервые принесена бескровная жертва; «бел-горюч камень» русских заговоров, мифический центр мира.</p>
+  <div class="src">Веселовский А. Н. Разыскания в области русского духовного стиха. СПб., 1879–1891; ЭСБЕ, ст. «Голубиная книга».</div>
+  <div class="notes">Здесь собрано всё, включая три угаданных ответа. Отметить: каждая «мать» обоснована евангельским или апокрифическим событием.</div>
+</section>
+
+<!-- 13. Правда и Кривда -->
+<section class="slide">
+  <div class="kicker">Философский смысл</div>
+  <h2>Правда и Кривда</h2>
+  <div class="cols">
+    <div class="verse" style="font-size:27px">
+      Это Кривда с Правдой соходилися,<br>
+      Промежду собой бились-дрались,<br>
+      Кривда Правду одолеть хочет…<br>
+      <b>Правда пошла на небеса</b><br>
+      К самому Христу, Царю Небесному;<br>
+      <b>А Кривда пошла у нас вся по всей земле</b>…<br>
+      От Кривды стал народ неправильный…
+      <span class="attr">Оксенов, 1908</span>
+    </div>
+    <div>
+      <ul class="list">
+        <li style="font-size:27px">Финал: Волотоману снятся два бьющихся зверя (в вариантах — зайца). Давыд толкует сон как битву Правды и Кривды.</li>
+        <li style="font-size:27px">Мир устроен свято, но Правда ушла с земли — отсюда трагизм народного мировоззрения.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="src">Федотов Г. П. Стихи духовные. М., 1991; символ зайца-правды — из «Беседы трёх святителей» (ЭСБЕ).</div>
+</section>
+
+<!-- 14. Духоборы -->
+<section class="slide">
+  <div class="kicker">Живая традиция</div>
+  <h2>Голубиная книга у <span class="red">духоборов</span></h2>
+  <div class="cols">
+    <div>
+      <ul class="list">
+        <li style="font-size:26px">Духоборы отвергают писаное Писание; их «Библия» — устная <span class="gold">«Животная книга»</span> псалмов.</li>
+        <li style="font-size:26px">Сокращённый стих стал богослужебным <span class="gold">псалмом № 89 «Царь Давыд Осеевич»</span>. Записан В. Д. Бонч-Бруевичем в Канаде от Ф. Объедкова (1909); ещё в 1857 г. — в Воронежской губ.</li>
+        <li style="font-size:26px">Псалом имеет «два смысла»: за буквой скрыто иносказание.</li>
+      </ul>
+    </div>
+    <div>
+      <div class="verse" style="font-size:24px">
+        …у меня есть книга голубиная… белый свет от сердца Господнего, красно солнце от лица Его…
+        <span class="attr">Псалом 89</span>
+      </div>
+      <div class="verse" style="font-size:24px;margin-top:22px">
+        <b>Кит-рыба</b> — это земные державцы. Они своими узаконениями… удерживают народ в темномрачном основании.<br>
+        <b>Плакун-трава</b> — …чады, которые нарождены от Господа… идут напротив власти.
+        <span class="attr">«Разъяснение» духоборца П. В. Батурина</span>
+      </div>
+    </div>
+  </div>
+  <div class="src">Животная книга духоборцев / Под ред. В. Д. Бонч-Бруевича. СПб., 1909. С. 108–110; Варенцов В. Сборник русских духовных стихов. СПб., 1860.</div>
+  <div class="notes">Кит, на котором стоит земля, у духоборов — государство, которое держит народ во тьме. Тот самый кит из второго вопроса. Космология превращается в социальную критику.</div>
+</section>
+
+<!-- 15. Маточкин -->
+<section class="slide">
+  <div class="kicker">Сегодня</div>
+  <h2>Перепев Александра Маточкина</h2>
+  <div class="cols" style="grid-template-columns: 1fr 380px;">
+    <div>
+      <ul class="list">
+        <li style="font-size:27px">Сказитель и этнический певец, выпускник СПбГУ; в репертуаре — более 70 старин: былины, баллады, духовные стихи.</li>
+        <li style="font-size:27px">Работает с изданиями XIX в. и полевыми записями северных рек.</li>
+        <li style="font-size:27px">Свёл <span class="gold">10 вариантов</span> стиха из петрозаводского собрания (2015) в единый текст ≈ 350 строк и издал его рукописной книгой «Северная старина. Голубиная книга».</li>
+      </ul>
+      <div class="verse" style="margin-top:26px;border-color:var(--gold);font-size:28px">
+        <b>Рекомендация:</b> послушать «Голубиную книгу» в его исполнении — тот же сюжет, что у Федосовой, но целиком, как «старину» северного сказителя.
+      </div>
+      <p class="play-note" style="font-size:20px;margin-top:16px"><a href="https://www.youtube.com/results?search_query=%D0%90%D0%BB%D0%B5%D0%BA%D1%81%D0%B0%D0%BD%D0%B4%D1%80+%D0%9C%D0%B0%D1%82%D0%BE%D1%87%D0%BA%D0%B8%D0%BD+%D0%93%D0%BE%D0%BB%D1%83%D0%B1%D0%B8%D0%BD%D0%B0%D1%8F+%D0%BA%D0%BD%D0%B8%D0%B3%D0%B0" target="_blank" rel="noopener">▶ Александр Маточкин — «Голубиная книга» на YouTube</a></p>
+    </div>
+    <figure>
+      <img src="matochkin.jpg" alt="Обложка «Северная старина. Голубиная книга»">
+    </figure>
+  </div>
+  <div class="src">Интервью А. Маточкина: etnoskop.ru; cultinfo.ru, 2025.</div>
+</section>
+
+<!-- 16. Источники -->
+<section class="slide">
+  <div class="kicker">Литература</div>
+  <h2>Источники</h2>
+  <ul class="list biblio">
+    <li>Древние российские стихотворения, собранные Киршею Даниловым. М.: Наука, 1977 (сер. «Литературные памятники»).</li>
+    <li>Бессонов П. А. Калеки перехожие. Вып. 1–6. М., 1861–1864; Варенцов В. Г. Сборник русских духовных стихов. СПб., 1860.</li>
+    <li>Мочульский В. Н. Историко-литературный анализ стиха о Голубиной книге. Варшава, 1887.</li>
+    <li>Веселовский А. Н. Разыскания в области русского духовного стиха. СПб., 1879–1891.</li>
+    <li>Федотов Г. П. Стихи духовные: Русская народная вера по духовным стихам. Париж, 1935; М.: Прогресс, 1991.</li>
+    <li>Топоров В. Н. Голубиная книга // Мифы народов мира. Т. 1. М., 1980.</li>
+    <li>Никитина С. Е. Голубиная книга // Православная энциклопедия. Т. 12. М., 2006.</li>
+    <li>Голубиная книга: Русские народные духовные стихи XI–XIX вв. / Сост. Л. Ф. Солощенко, Ю. С. Прокошин. М.: Московский рабочий, 1991.</li>
+    <li>Кузнецова В. П. И. А. Федосова и её духовные стихи // Рябининские чтения — 2015. Петрозаводск, 2015.</li>
+    <li>Животная книга духоборцев / Под ред. В. Д. Бонч-Бруевича. СПб., 1909.</li>
+  </ul>
+</section>
+
+</div>
+
+<div id="ytwrap"><div id="yt"></div></div>
+<div id="progress"></div>
+<div id="counter"></div>
+<div id="help">← → листать · F — полный экран · N — заметки</div>
+<div id="notes"><div class="h">Заметки докладчика</div><div id="notesBody"></div></div>
+
+<script>
+(function () {
+  var stage = document.getElementById('stage');
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var cur = 0, shown = 0;
+
+  function fit() {
+    var s = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+    stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit); fit();
+
+  function steps(i) { return slides[i].querySelectorAll('.step'); }
+
+  function paint() {
+    var st = steps(cur);
+    for (var k = 0; k < st.length; k++) st[k].classList.toggle('on', k < shown);
+  }
+
+  function show(i, revealAll) {
+    cur = Math.max(0, Math.min(slides.length - 1, i));
+    shown = revealAll ? steps(cur).length : 0;
+    slides.forEach(function (s, k) { s.classList.toggle('active', k === cur); });
+    paint();
+    document.getElementById('progress').style.width = ((cur + 1) / slides.length * 100) + '%';
+    document.getElementById('counter').textContent = (cur + 1) + ' / ' + slides.length;
+    var n = slides[cur].querySelector('.notes');
+    document.getElementById('notesBody').textContent = n ? n.textContent : '—';
+    try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+  }
+
+  function next() {
+    if (shown < steps(cur).length) { shown++; paint(); }
+    else if (cur < slides.length - 1) show(cur + 1, false);
+  }
+  function prev() {
+    if (shown > 0) { shown--; paint(); }
+    else if (cur > 0) show(cur - 1, true);
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].indexOf(e.key) >= 0) { e.preventDefault(); next(); }
+    else if (['ArrowLeft', 'PageUp', 'Backspace'].indexOf(e.key) >= 0) { e.preventDefault(); prev(); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); show(cur + 1, false); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); show(cur - 1, true); }
+    else if (e.key === 'Home') show(0, false);
+    else if (e.key === 'End') show(slides.length - 1, true);
+    else if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+    else if (e.key === 'n' || e.key === 'N' || e.key === 'т' || e.key === 'Т') document.getElementById('notes').classList.toggle('show');
+  });
+
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('button, a, #notes')) return;
+    if (e.clientX > window.innerWidth / 3) next(); else prev();
+  });
+
+  var tx = null;
+  document.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (tx === null) return;
+    var dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) { if (dx < 0) next(); else prev(); }
+    tx = null;
+  });
+
+  var start = parseInt((location.hash || '').slice(1), 10);
+  show(isNaN(start) ? 0 : start - 1, false);
+
+  /* ---- Запись Федосовой (YouTube) ---- */
+  var VIDEO = 'yqKX82H6K_k';
+  var WATCH = 'https://www.youtube.com/watch?v=' + VIDEO;
+  var btn = document.getElementById('playBtn');
+  var ic = document.getElementById('playIc');
+  var lbl = document.getElementById('playLbl');
+  var note = document.getElementById('playNote');
+  var player = null, ready = false, playing = false, wantPlay = false;
+
+  function fallback(msg) {
+    note.innerHTML = msg + ' <a href="' + WATCH + '" target="_blank" rel="noopener">Открыть запись на YouTube</a>';
+  }
+  function setState(p) {
+    playing = p;
+    ic.textContent = p ? '❚❚' : '▶';
+    lbl.textContent = p ? 'Пауза' : 'Слушать запись 1896 г.';
+  }
+
+  window.onYouTubeIframeAPIReady = function () {
+    player = new YT.Player('yt', {
+      width: 200, height: 113, videoId: VIDEO,
+      playerVars: { controls: 0, playsinline: 1, rel: 0 },
+      events: {
+        onReady: function () { ready = true; if (wantPlay) player.playVideo(); },
+        onStateChange: function (e) {
+          if (e.data === YT.PlayerState.PLAYING) setState(true);
+          else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) setState(false);
+        },
+        onError: function () {
+          setState(false);
+          fallback('Встроенный плеер недоступен (откройте через «Запустить презентацию.command»).');
+        }
+      }
+    });
+  };
+
+  var s = document.createElement('script');
+  s.src = 'https://www.youtube.com/iframe_api';
+  s.onerror = function () { fallback('Нет доступа к YouTube.'); };
+  document.head.appendChild(s);
+
+  btn.addEventListener('click', function () {
+    if (location.protocol === 'file:') fallback('При открытии файла напрямую YouTube блокирует встроенный плеер.');
+    if (!ready) { wantPlay = true; lbl.textContent = 'Загрузка…'; return; }
+    if (playing) player.pauseVideo(); else player.playVideo();
+  });
+})();
+</script>
+</body>
+</html>
