@@ -148,7 +148,11 @@
   #help { position: fixed; left: 18px; bottom: 12px; font-size: 14px; color: rgba(185,171,143,.55); z-index: 5; }
   .notes { display: none; }
 
-  .biblio li { font-size: 21px; line-height: 1.32; margin-bottom: 9px; }
+  /* слайд источников: список мельче, гравюра целиком */
+  .lit .cols { grid-template-columns: 1fr 470px; gap: 54px; align-items: start; }
+  .lit figure img { flex: none; height: auto; max-height: 580px; filter: drop-shadow(0 16px 40px rgba(0,0,0,.7)); }
+  .biblio li { font-size: 18px; line-height: 1.3; margin-bottom: 7px; padding-left: 26px; }
+  .biblio li::before { font-size: 16px; top: 3px; }
 </style>
 </head>
 <body>
@@ -541,9 +545,10 @@
 </section>
 
 <!-- 16. Источники -->
-<section class="slide">
+<section class="slide lit">
   <div class="kicker">Литература</div>
   <h2>Источники</h2>
+  <div class="cols">
   <ul class="list biblio">
     <li>Древние российские стихотворения, собранные Киршею Даниловым. М.: Наука, 1977 (сер. «Литературные памятники»).</li>
     <li>Бессонов П. А. Калеки перехожие. Вып. 1–6. М., 1861–1864; Варенцов В. Г. Сборник русских духовных стихов. СПб., 1860.</li>
@@ -556,6 +561,11 @@
     <li>Кузнецова В. П. И. А. Федосова и её духовные стихи // Рябининские чтения — 2015. Петрозаводск, 2015.</li>
     <li>Животная книга духоборцев / Под ред. В. Д. Бонч-Бруевича. СПб., 1909.</li>
   </ul>
+  <figure>
+    <img src="matveev.jpg" alt="Сергей Матвеев. «Выпадала книга Голубиная», 2011">
+    <figcaption>Сергей Матвеев. «Выпадала книга Голубиная». 2011</figcaption>
+  </figure>
+  </div>
 </section>
 
 </div>
