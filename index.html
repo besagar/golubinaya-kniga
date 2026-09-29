@@ -92,18 +92,29 @@
   .title-slide h1 { font-size: 120px; }
 
   /* плашки-матери */
-  .mothers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-  .mother { border: 1px solid var(--line); padding: 20px 22px; background: rgba(0,0,0,.18); }
+  .lubok-bg {
+    position: absolute; inset: 34px; pointer-events: none;
+    background: url("cosmography.jpg") center / contain no-repeat;
+    opacity: .1; filter: invert(1) sepia(1) saturate(.4) hue-rotate(5deg);
+    -webkit-mask-image: radial-gradient(ellipse 42% 46% at 50% 50%, #000 55%, transparent 100%);
+    mask-image: radial-gradient(ellipse 42% 46% at 50% 50%, #000 55%, transparent 100%);
+  }
+  .mothers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; position: relative; }
+  .mother { border: 1px solid var(--line); padding: 20px 22px; background: rgba(12,10,8,.72); }
   .mother .what { font-size: 18px; letter-spacing: .16em; text-transform: uppercase; color: var(--parch-dim); }
   .mother .who { font-family: var(--display); font-size: 32px; color: var(--gold); margin: 6px 0 6px; }
   .mother .why { font-size: 21px; line-height: 1.3; }
 
   /* вопрос с раскрытием ответа */
   .qa { justify-content: flex-start; }
-  .qa h2 { font-size: 70px; margin: 8px 0 46px; }
-  .qa .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; flex: 1; min-height: 0; align-items: start; }
-  .qa .name { font-family: var(--display); font-size: 64px; color: var(--red); line-height: 1; margin-bottom: 28px; }
-  .qa .grid p { font-size: 27px; }
+  .qa h2 { font-size: 66px; margin: 8px 0 40px; }
+  .qa .grid { display: grid; grid-template-columns: .95fr 1fr 1.02fr; gap: 44px; flex: 1; min-height: 0; align-items: start; }
+  .qa .name { font-family: var(--display); font-size: 58px; color: var(--red); line-height: 1; margin-bottom: 24px; }
+  .qa .grid p { font-size: 25px; }
+  .qa .verse { font-size: 26px; }
+  .qa figure { align-self: start; }
+  .qa figure img { flex: none; height: auto; max-height: 435px; }
+  .qa figcaption { margin-top: 14px; }
 
   /* пошаговое раскрытие */
   .step { opacity: 0; transition: opacity .45s ease; }
@@ -357,11 +368,15 @@
   <div class="kicker">Вопрос Волотомана</div>
   <h2>Который город городам <span class="red">отец</span>?</h2>
   <div class="grid">
-    <div class="step">
+    <figure class="step" data-step="1">
+      <img src="jerusalem-map.jpg" alt="Карта мира в виде клеверного листа, 1581">
+      <figcaption>Х. Бюнтинг. Мир в виде клеверного листа с Иерусалимом в середине. 1581</figcaption>
+    </figure>
+    <div class="step" data-step="1">
       <div class="name">Иерусалим</div>
       <p class="muted">Не столица и не самый большой город, а <span class="gold">середина земли</span>: под алтарём храма Воскресения, по преданию, лежит «пуп земли».</p>
     </div>
-    <div class="step verse">
+    <div class="step verse" data-step="2">
       Иерусалим-город городам отец.<br>
       Почему тот город городам отец?<br>
       Потому Иерусалим городам отец:<br>
@@ -378,11 +393,15 @@
   <div class="kicker">Вопрос Волотомана</div>
   <h2>Кая рыба всем рыбам <span class="red">мати</span>?</h2>
   <div class="grid">
-    <div class="step">
+    <figure class="step" data-step="1">
+      <img src="whale.jpg" alt="Кит-остров в средневековом бестиарии">
+      <figcaption>Кит, принятый за остров. Латинский бестиарий, ок. 1270 — западная параллель тому же образу</figcaption>
+    </figure>
+    <div class="step" data-step="1">
       <div class="name">Кит-рыба</div>
       <p class="muted">На ней держится земля. Число китов в вариантах разное — три, семь, тридцать; образ пришёл прямо из «Беседы трёх святителей».</p>
     </div>
-    <div class="step verse">
+    <div class="step verse" data-step="2">
       Кит-рыба всем рыбам мати…<br>
       <b>На трех рыбах земля основана.</b><br>
       Стоит кит-рыба — не сворохнется;<br>
@@ -400,11 +419,15 @@
   <div class="kicker">Вопрос Волотомана</div>
   <h2>Кая гора всем горам <span class="red">мати</span>?</h2>
   <div class="grid">
-    <div class="step">
+    <figure class="step" data-step="1">
+      <img src="tabor.jpg" alt="Икона «Преображение»">
+      <figcaption>«Преображение». Икона нач. XV в. из Переславля-Залесского, традиционно связываемая с Феофаном Греком. Третьяковская галерея</figcaption>
+    </figure>
+    <div class="step" data-step="1">
       <div class="name">Фавор</div>
       <p class="muted">Гора Преображения — и та самая, на которую у Федосовой падает книга. У Кирши Данилова ответ другой: <span class="gold">«Сионская гора — всем горам мати»</span>. Кто сказал «Сион» — тоже прав.</p>
     </div>
-    <div class="step verse">
+    <div class="step verse" data-step="2">
       Фавор-гора всем горам мати.<br>
       Почему Фавор-гора горам мати?<br>
       <b>Преобразился на ней сам Исус Христос</b>,<br>
@@ -419,6 +442,7 @@
 
 <!-- 12. Матери -->
 <section class="slide">
+  <div class="lubok-bg"></div>
   <div class="kicker">Символика</div>
   <h2>«Которая всем … мати?»</h2>
   <p class="muted" style="font-size:25px;margin:-14px 0 26px">Вторая серия вопросов выстраивает иерархию мира: у каждого рода вещей — своя «мать», главная святыня.</p>
@@ -433,7 +457,7 @@
     <div class="mother"><div class="what">зверь</div><div class="who">Индрик</div><div class="why">ходит под землёй, прочищает ключи</div></div>
   </div>
   <p style="font-size:22px;margin-top:26px" class="muted">Алатырь (А. Н. Веселовский) — <span class="gold">алтарный камень</span> Сионской церкви, где впервые принесена бескровная жертва; «бел-горюч камень» русских заговоров, мифический центр мира.</p>
-  <div class="src">Веселовский А. Н. Разыскания в области русского духовного стиха. СПб., 1879–1891; ЭСБЕ, ст. «Голубиная книга».</div>
+  <div class="src">Веселовский А. Н. Разыскания в области русского духовного стиха. СПб., 1879–1891; ЭСБЕ, ст. «Голубиная книга». Фон — русский лубок «Космография», нач. XVIII в.</div>
   <div class="notes">Здесь собрано всё, включая три угаданных ответа. Отметить: каждая «мать» обоснована евангельским или апокрифическим событием.</div>
 </section>
 
@@ -473,6 +497,9 @@
         <li style="font-size:26px">Сокращённый стих стал богослужебным <span class="gold">псалмом № 89 «Царь Давыд Осеевич»</span>. Записан В. Д. Бонч-Бруевичем в Канаде от Ф. Объедкова (1909); ещё в 1857 г. — в Воронежской губ.</li>
         <li style="font-size:26px">Псалом имеет «два смысла»: за буквой скрыто иносказание.</li>
       </ul>
+      <img src="doukhobors-crop.jpg" alt="Духоборки в упряжке плуга, 1899"
+           style="width:100%;height:auto;margin-top:20px;filter:drop-shadow(0 10px 24px rgba(0,0,0,.6))">
+      <figcaption style="font-size:17px;color:var(--parch-dim);font-style:italic;margin-top:8px">Духоборки в упряжке плуга. Колония Тандер-Хилл, Манитоба, 1899</figcaption>
     </div>
     <div>
       <div class="verse" style="font-size:24px">
@@ -551,11 +578,23 @@
   }
   window.addEventListener('resize', fit); fit();
 
-  function steps(i) { return slides[i].querySelectorAll('.step'); }
+  function stepEls(i) { return slides[i].querySelectorAll('.step'); }
+
+  /* Элементы с одинаковым data-step раскрываются вместе.
+     Без атрибута каждый элемент — отдельный шаг. */
+  function stepNo(el, k) {
+    var n = parseInt(el.getAttribute('data-step'), 10);
+    return isNaN(n) ? k + 1 : n;
+  }
+  function steps(i) {
+    var st = stepEls(i), max = 0;
+    for (var k = 0; k < st.length; k++) max = Math.max(max, stepNo(st[k], k));
+    return { length: max };
+  }
 
   function paint() {
-    var st = steps(cur);
-    for (var k = 0; k < st.length; k++) st[k].classList.toggle('on', k < shown);
+    var st = stepEls(cur);
+    for (var k = 0; k < st.length; k++) st[k].classList.toggle('on', stepNo(st[k], k) <= shown);
   }
 
   function show(i, revealAll) {
